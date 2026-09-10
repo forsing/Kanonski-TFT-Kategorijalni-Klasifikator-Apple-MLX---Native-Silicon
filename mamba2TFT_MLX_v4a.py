@@ -117,7 +117,7 @@ def loss_fn(model, x, y):
 
 # --- TRENING PETLJA ---
 def treniraj_v2():
-    csv_putanja = "/Users/4c/Desktop/GHQ/data/loto7_4682_k72.csv"
+    csv_putanja = "/data/loto7_4682_k72.csv"
     X, Y = ucitaj_mlx_podatke(csv_putanja, prozor=200)
     
     model = MLXCanonicalTFT()
