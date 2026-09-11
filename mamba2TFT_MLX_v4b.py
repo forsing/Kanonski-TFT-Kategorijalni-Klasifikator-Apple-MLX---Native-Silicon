@@ -1,6 +1,6 @@
 # Model V4: Kanonski TFT Kategorijalni Klasifikator (Apple MLX - Native Silicon)
 
-
+# NEW - last version
 
 import mlx.core as mx
 import mlx.nn as nn
@@ -130,11 +130,11 @@ def treniraj_v2():
     # ISPRAVLJENO: Uzima se indeks 0 za tačan broj uzoraka
     num_samples = X.shape[0]
     
-    print("Model V2: Kanonski TFT Kategorijalni Klasifikator (Apple MLX - Native Silicon)")
+    print("Model V4: Kanonski TFT Kategorijalni Klasifikator (Apple MLX - Native Silicon)")
     print("Trening modela je pokrenut...")
     start_time = time.time()
     
-    for epoha in range(1, 1001):
+    for epoha in range(1, 301):
         indeksi = np.random.permutation(num_samples)
         epoha_loss = 0.0
         koraci = 0
@@ -152,14 +152,14 @@ def treniraj_v2():
             koraci += 1
             
         if epoha % 50 == 0:
-            print(f"Epoha [{epoha}/1200] | Kategorijalni Gubitak: {epoha_loss/koraci:.4f}")
+            print(f"Epoha [{epoha}/300] | Kategorijalni Gubitak: {epoha_loss/koraci:.4f}")
             
     print(f"Trening završen za: {time.time() - start_time:.2f} sekundi.")
             
     # Predikcija na osnovu zadnjih 200 redova
     df_provera = pd.read_csv(csv_putanja, header=None)
-    zadnji_prozor = mx.array(df_provera.values[-200:].astype(np.int32)).unsqueeze(0)
-    
+    zadnji_prozor = mx.expand_dims(mx.array(df_provera.values[-200:].astype(np.int32)), 0)
+
     izlaz_pred = model(zadnji_prozor)
     predikcija = mx.argmax(izlaz_pred, axis=-1).squeeze(0)
     mx.eval(predikcija)
@@ -175,7 +175,20 @@ if __name__ == "__main__":
 
 
 """
+Model V4: Kanonski TFT Kategorijalni Klasifikator (Apple MLX - Native Silicon)
+Trening modela je pokrenut...
+Epoha [50/300] | Kategorijalni Gubitak: 17.5160
+Epoha [100/300] | Kategorijalni Gubitak: 11.9699
+Epoha [150/300] | Kategorijalni Gubitak: 8.8269
+Epoha [200/300] | Kategorijalni Gubitak: 6.7908
+Epoha [250/300] | Kategorijalni Gubitak: 5.3210
+Epoha [300/300] | Kategorijalni Gubitak: 4.3611
+Trening završen za: 1201.49 sekundi.
 
+==================================================
+REZULTAT ZA FAJL /data/loto7_4682_k72_loto_2963.csv (Sledeći red - MLX V4):
+[ 3  x 10 y 15 z 30]
+==================================================
 """
 
 
@@ -193,27 +206,6 @@ Model V4: Kanonski TFT Kategorijalni Klasifikator (Apple MLX - Native Silicon)
 Arhitektura Mamba 2 se zasniva na teoriji Structured State Space Duality (SSD). 
 Mamba 2 omogućava da se proračun stanja transformiše u blokovske matrične multiplikacije, 
 što je znatno lakše napisati u čistom Python-u/PyTorch-u. 
-"""
-
-
-
-"""
-Optimalni odnosa između dužine istorijskog prozora i broja epoha za bazu podataka. 
-Cilj je balans: dovoljno velik prozor da Mamba-2 uhvati cikluse, 
-ali dovoljno primera za trening da model ne upadne u hiper-podešavanje (overfitting).
-
-Evo optimalnih vrednosti za oba modela na osnovu količine podataka u tri CSV fajla, 
-kako bi se sprečio overfitting (prenaučenost) i maksimalno iskoristila dužina istorije: 
-
-Model V1,V3: PyTorch (Kraći prozor, brža konvergencija)
-Za 4682 reda: Prozor: 40 | Epohe: 150 
-Za 2963 reda: Prozor: 30 | Epohe: 120 
-Za 1719 reda: Prozor: 20 | Epohe: 100  
-
-Model V2,V4: Apple MLX (Širi prozor, dublja istorija)
-Za 4682 reda: Prozor: 200 | Epohe: 1200 
-Za 2963 reda: Prozor: 100 | Epohe: 1000 
-Za 1719 reda: Prozor:  50 | Epohe: 400 
 """
 
 
